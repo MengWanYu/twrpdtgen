@@ -1,10 +1,10 @@
 #
  
-Copyright (C) 2022 The Android Open Source Project
+#Copyright (C) 2022 The Android Open Source Project
  
 #
  
-SPDX-License-Identifier: Apache-2.0
+#SPDX-License-Identifier: Apache-2.0
  
 #
 from datetime import datetime
@@ -31,11 +31,11 @@ FSTAB_LOCATIONS = [Path() / "etc" / "recovery.fstab"]
 FSTAB_LOCATIONS += [Path() / dir / "etc" / "recovery.fstab"
 for dir#
  
-Copyright (C) 2022 The Android Open Source Project
+#Copyright (C) 2022 The Android Open Source Project
  
 #
  
-SPDX-License-Identifier: Apache-2.0
+#SPDX-License-Identifier: Apache-2.0
  
 #
 from datetime import datetime
