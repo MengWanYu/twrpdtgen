@@ -14,11 +14,11 @@ from sebaubuntu_libs.libandroid.props import BuildProp
 from sebaubuntu_libs.liblogging import LOGD
 from shutil import copyfile, rmtree
 from stat import S_IRWXU, S_IRGRP, S_IROTH
-from twrpdtgen import __version__ as version  # 修正：导入正确的版本变量（原version→__version__）
+from twrpdtgen import __version__ as version
 from twrpdtgen.templates import render_template
 from typing import List
 
-# 设备属性文件路径列表（修正：统一缩进格式）
+# 设备属性文件路径列表
 BUILDPROP_LOCATIONS = [
     Path() / "default.prop",
     Path() / "prop.default",
@@ -26,11 +26,11 @@ BUILDPROP_LOCATIONS = [
 BUILDPROP_LOCATIONS += [Path() / dir / "build.prop" for dir in ["system", "vendor"]]
 BUILDPROP_LOCATIONS += [Path() / dir / "etc" / "build.prop" for dir in ["system", "vendor"]]
 
-# Fstab文件路径列表（修正：删除重复代码，统一格式）
+# Fstab文件路径列表
 FSTAB_LOCATIONS = [Path() / "etc" / "recovery.fstab"]
 FSTAB_LOCATIONS += [Path() / dir / "etc" / "recovery.fstab" for dir in ["system", "vendor"]]
 
-# Init脚本路径列表（修正：统一缩进格式）
+# Init脚本路径列表
 INIT_RC_LOCATIONS = [Path()]
 INIT_RC_LOCATIONS += [Path() / dir / "etc" / "init" for dir in ["system", "vendor"]]
 
@@ -41,25 +41,19 @@ class DeviceTree:
     It initialize a basic device tree structure
     and save the location of some important files
     """
-    # 修正：类构造方法名（原init→__init__，Python类构造方法必须双下划线）
     def __init__(self, image: Path, aik_path: Path = None):
         """Initialize the device tree class."""
         self.image = image
         self.current_year = str(datetime.now().year)
         
-        # Check if the image exists
-        # 在 device_tree.py 的 __init__ 方法中，添加打印日志（第51行左右）
-
-    # 新增：打印传入的镜像路径（用于调试）
-    LOGD(f"接收的镜像路径：{image}，绝对路径：{image.resolve()}")
-    # Check if the image exists
-    if not self.image.is_file():
-        raise FileNotFoundError(f"Specified file doesn't exist：{image.resolve()}")
-
-        if not self.image.is_file():
-            raise FileNotFoundError("Specified file doesn't exist")
+        # 打印传入的镜像路径（调试用）
+        LOGD(f"接收的镜像路径：{self.image}，绝对路径：{self.image.resolve()}")
         
-        # Extract the image: Use local AIK if provided, else auto-clone
+        # 检查镜像文件是否存在
+        if not self.image.is_file():
+            raise FileNotFoundError(f"Specified file doesn't exist：{self.image.resolve()}")
+        
+        # 解包镜像：优先使用本地AIK
         self.aik_manager = AIKManager()
         if aik_path and aik_path.is_dir():
             self.aik_manager.aik_path = aik_path.resolve()
@@ -77,12 +71,12 @@ class DeviceTree:
         
         self.device_info = DeviceInfo(self.build_prop)
         
-        # Generate fstab
+        # 生成fstab
         fstab = None
         for fstab_location in [self.image_info.ramdisk / location for location in FSTAB_LOCATIONS]:
             if not fstab_location.is_file():
                 continue
-            LOGD(f"Generating fstab using {fstab_location} as reference...")  # 优化：日志显示实际路径
+            LOGD(f"Generating fstab using {fstab_location} as reference...")
             fstab = Fstab(fstab_location)
             break
         
@@ -90,7 +84,7 @@ class DeviceTree:
             raise AssertionError("fstab not found")
         self.fstab = fstab
         
-        # Search for init rc files
+        # 查找init脚本
         self.init_rcs: List[Path] = []
         for init_rc_path in [self.image_info.ramdisk / location for location in INIT_RC_LOCATIONS]:
             if not init_rc_path.is_dir():
@@ -119,14 +113,12 @@ class DeviceTree:
         self._render_template(device_tree_folder, "BoardConfig.mk")
         self._render_template(device_tree_folder, "device.mk")
         self._render_template(device_tree_folder, "extract-files.sh")
-        # 修正1：调用私有方法（原render_template→_render_template，少下划线）
-        # 修正2：文件名拼接（原omni{→omni_，少下划线导致命名错误）
         self._render_template(device_tree_folder, "omni_device.mk", out_file=f"omni_{self.device_info.codename}.mk")
         self._render_template(device_tree_folder, "README.md")
         self._render_template(device_tree_folder, "setup-makefiles.sh")
         self._render_template(device_tree_folder, "vendorsetup.sh")
         
-        # Set permissions
+        # 设置文件权限
         chmod(device_tree_folder / "extract-files.sh", S_IRWXU | S_IRGRP | S_IROTH)
         chmod(device_tree_folder / "setup-makefiles.sh", S_IRWXU | S_IRGRP | S_IROTH)
         
@@ -150,7 +142,7 @@ class DeviceTree:
         if not git:
             return device_tree_folder
         
-        # Create a git repo
+        # 创建Git仓库
         LOGD("Creating git repo...")
         git_repo = Repo.init(device_tree_folder)
         git_config_reader = git_repo.config_reader()
@@ -184,5 +176,5 @@ class DeviceTree:
         )
 
     def cleanup(self):
-        # Cleanup
+        # 清理资源
         self.aik_manager.cleanup()
