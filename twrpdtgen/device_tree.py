@@ -48,6 +48,18 @@ class DeviceTree:
         self.current_year = str(datetime.now().year)
         
         # Check if the image exists
+        # 在 device_tree.py 的 __init__ 方法中，添加打印日志（第51行左右）
+    def __init__(self, image: Path, aik_path: Path = None):
+        """Initialize the device tree class."""
+        self.image = image
+        self.current_year = str(datetime.now().year)
+        
+    # 新增：打印传入的镜像路径（用于调试）
+    LOGD(f"接收的镜像路径：{image}，绝对路径：{image.resolve()}")
+    # Check if the image exists
+    if not self.image.is_file():
+        raise FileNotFoundError(f"Specified file doesn't exist：{image.resolve()}")
+
         if not self.image.is_file():
             raise FileNotFoundError("Specified file doesn't exist")
         
