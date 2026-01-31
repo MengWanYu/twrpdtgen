@@ -30,6 +30,13 @@ def main():
 	parser.add_argument("-d", "--debug", action='store_true',
 						help="enable debugging features")
 
+	parser.add_argument(
+         "--aik-path", 
+         type=Path, 
+         default=None, 
+         help="Path to LOCAL Android Image Kitchen (AIK) folder. Use this to skip auto-cloning AIK (fixes AIK extraction errors)."
+	)
+
 	args = parser.parse_args()
 
 	setup_logging(args.debug)
