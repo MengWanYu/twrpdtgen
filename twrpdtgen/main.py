@@ -41,7 +41,7 @@ def main():
 
 	setup_logging(args.debug)
 
-	device_tree = DeviceTree(image=args.image)
+	device_tree = DeviceTree(image=args.image, aik_path=args.aik_path)  # 新增 aik_path=args.aik_path
 	folder = device_tree.dump_to_folder(args.output, git=args.git)
 
 	print(f"\nDone! You can find the device tree in {folder}")
